@@ -1,21 +1,22 @@
-function Automata(state,transition){
+function Automata(stateMeta,transition){
     var automata=this
     this.div=document.createElement('div')
     this.div.style.lineHeight=0
     this.div.width='100%'
     this.div.style.position='relative'
-    this.state=state
-    setCoordinate()
-
-    for(let s in this.state){
-        var stateDiv=this.state[s].div
-        this.div.appendChild(stateDiv)
-        this.state[s].div.style.position='absolute'
-        this.state[s].position=automata.chessPosition[s]
-        this.state[i].index=i
-        this.state[i].div.style.left=this.state[s].position[0]-stateWidth/2+'px'
-        this.state[i].div.style.top=this.state[s].position[1]-stateWidth/2+'px'
+    this.state=[]
+    for(let s in stateMeta){
+        this.state.append(new State(stateMeta[i].name,stateMeta[i].isFinal))
     }
+    setPosition()
+
+    var setPosition=()=>{
+        for(let s in this.state){
+            
+        }
+    }
+            
+
     function positionToState(p){
         for(let s of automata.state){
             if( p[0]==s.position[0]&&p[1]==s.position[1])return c
