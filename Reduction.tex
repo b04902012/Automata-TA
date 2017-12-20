@@ -1,0 +1,116 @@
+\documentclass{article}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{fontspec}
+\usepackage{amsmath} 
+\usepackage{graphicx}
+\usepackage{nopageno}
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{titlesec}
+%\usepackage{ulem}
+\usepackage{calrsfs}
+\DeclareMathAlphabet{\pazocal}{OMS}{zplm}{m}{n}
+\usepackage{pgfplots}
+%\usepackage{CJK}
+\usepackage{xeCJK}
+\setmainfont{Liberation Serif}
+\setmonofont{Hack}
+%\setmainfont{AR PL UKai TW}
+\setCJKmainfont{AR PL UKai TW}
+\renewcommand{\ttdefault}{pcr}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\XeTeXlinebreaklocale "zh"
+\usepackage[a4paper, total={6in, 9in}]{geometry}
+\pagestyle{plain}
+\setlength{\parskip}{5pt}
+\fontsize{14pt}{20pt}\selectfont
+\titleformat*{\subsection}{\Large\bfseries}
+\makeatletter
+\newenvironment{xitemize}{%
+    \@nameuse{fontitem\romannumeral\the\@itemdepth}
+    \itemize
+}{%
+    \enditemize
+}
+\makeatother
+\newcommand{\fontitem}{\Large}
+\newcommand{\fontitemi}{\normalsize}
+\newcommand{\fontitemii}{\normalsize}
+
+\begin{document}
+\begin{center}
+    {\huge Reduction}
+\end{center}
+
+\section{Concept}
+當我們想要證明一個語言 \(L_A\) 的性質\(P\)的時候，我們不一定需要從頭證起，而是可以藉由它和\(L_B\)的關係來證明。舉例來說，如果我們能夠證明：\\
+　　　　(i) \(L_B\)具有性質\(P\)\\
+　　　　(ii) 如果\(L_A\)不具有性質\(P\)，那麼\(L_B\)就不具有性質\(P\)\\
+
+那麼綜合這兩點，就可以得到\(L_A\)也具有性質\(P\)。\\
+
+在這次上課中，我們關注的性質是不可被決定性，而課堂中已經證明過了 \(HALT\) 是不可被決定的，因此，對於另一個語言 \(L\) ，如果我們能夠證明「\(L\) 可被決定 \(\Rightarrow\) \(HALT\) 可被決定」，那麼事實上就證明了 \(L\) 的不可決定性。
+
+　　這就是歸約的概念。如果我們證明了「\(L_A\) 可被決定 \(\Rightarrow\) \(L_B\) 可被決定」，那麼我們說「\(L_B\) 可以歸約到 \(L_A\)」。歸約分成兩種：
+    \begin{itemize}
+    \item Map Reduction: \\
+        證明存在一個可計算的函數 \(F\) ，使得：
+        \begin{center} \(\forall w \in \Sigma*, w\in L_B \Leftrightarrow F(w) \in L_A\) \end{center}
+
+    \item Turing Reduction:\\
+        假設\(\pazocal{M}_A\) 是決定 \(L_A\) 的圖靈機，證明存在一台決定 \(L_B\) 的圖靈機 \(\pazocal{M}_B\) ，以 \(\pazocal{M}_A\) 作為其中一個子程序。
+    \end{itemize}
+
+\section{Example}
+\textit{Tony} 的講義上列了還不少的例子，這邊作為範例，給出 \(L_4\) 的證明。
+
+\(L_4:=\{\floor{\pazocal{M}} | L(\pazocal{M}) = \{a^nb^n | n\geq 0\}\}\)
+
+Assume that \(L_4\) is decidable for contradiction. By it's decidability, there exists a Turing machine \(\pazocal{M}_4\) deciding \(L_4\)。Now we'll construct a computable procedure that decides \(HALT\)。
+
+\noindent    (1) Take \(\floor{\pazocal{M}}\) and \(w\) as input.\\
+\noindent    (2) Construct a new Turing machine \(\pazocal{M}_w\) such that:
+    \begin{center}\(L(\pazocal{M}_w)=\left\{\begin{aligned}
+    &\{a^nb^n|n\geq 0\}, && \text{if } \pazocal{M} \text{ accepts } w \\
+    &\varnothing, && \text{otherwise}
+    \end{aligned} \right.\)\end{center}
+\noindent   (3) Use \(\pazocal{M}_4\) as subroutine: output the result of \(\pazocal{M}_4(\floor{\pazocal{M}_w})\).
+
+    Before giving the construction for \(\pazocal{M}_w\), let's examine the correctness of this procedure first. That is to say, let's check that \(\pazocal{M}_4\) accepts \(\floor{\pazocal{M}_w}\) iff \((\floor{\pazocal{M}}, w) \in HALT\).
+
+    \begin{center}\(\begin{aligned}
+    \pazocal{M}_4 \text{ accepts } \floor{\pazocal{M}_w} & \Leftrightarrow L(\pazocal{M}_w) = \{a^nb^n|n \geq 0\} \\
+                                               & \Leftrightarrow \pazocal{M} \text{ accepts } w \\
+                                               & \Leftrightarrow (\floor{\pazocal{M}}, w) \in HALT
+    \end{aligned}\)\end{center}
+    So the correctness has been proved. The following is the construction for \(\pazocal{M}_w\).
+
+\noindent(1) Input \(u\)\\
+\noindent(2) Simulate the run of \(\pazocal{M}\) on \(w\).\\
+\noindent(3)\\
+　　If \(\pazocal{M}\) accepts \(w\):\\
+　　　　If \(u\) is in \(\{a^nb^n|n\geq 0\}\):\\
+　　　　　　Accept \(u\).\\
+　　　　Else:\\
+　　　　　　Reject \(w\).\\
+　　Else:\\
+　　　　Reject \(w\).
+
+    For the correctness of this construction, consider the three following cases:\\
+    \begin{itemize}
+        \item \(\pazocal{M}\) accepts \(w\):\\
+            In such case, \(\pazocal{M}_w\) accepts \(u\) iff \(u\) is in \(\{a^nb^n | n \geq 0\}\), so \(L(\pazocal{M}_w) = \{a^nb^n | n \geq 0\}\).\\
+        \item \(\pazocal{M}\) rejects \(w\):\\
+            In such case, \(\pazocal{M}_w\) rejects every \(u\) in \(\Sigma^*\), so \(L(\pazocal{M}_w) = \varnothing\).\\
+        \item \(\pazocal{M}\) does halt on \(w\):\\
+            In such case, \(\pazocal{M}_w\) also will not halt while simulating, so \(L(\pazocal{M}_w) = \varnothing\).\\
+    \end{itemize}
+
+    As a result, \begin{center}\(L(\pazocal{M}_w)=\left\{\begin{aligned}
+    &\{a^nb^n|n\geq 0\}, && \text{if } \pazocal{M} \text{ accepts } w \\
+    &\varnothing, && \text{otherwise}
+    \end{aligned} \right.\)\end{center}, which implies the correctness of the construction.
+\end{document}　
